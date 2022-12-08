@@ -104,22 +104,70 @@ e = Node("e", parent=a)
 d = Node("d", parent=root)
 print(RenderTree(root))
 
+aNodeListExample = [root,a,e,d]
+[aNodeListExample]
+
+# %%
+from anytree import Node, RenderTree
+
+def findParentDirFromIndentation(currentLineIndentation: int, previousLineIndentation: int, dirs: List[str]) -> str:
+    '''
+    Function to find the parent directory using:
+    - current line's indentation
+    - the previous line's indentation
+    '''
+    parentDir: str = None
+    if currentLineIndentation > previousLineIndentation:
+        #then previous dir is the parent
+        parentDir = dirs[-1]
+    elif currentLineIndentation < previousLineIndentation:
+        #then we need to find the parent using the currentLineIndentation as an index
+        parentDir = dirs[int(currentLineIndentation/2)-1]
+    return parentDir
+        
+    #if 
+
 def getDirTree(input):
     '''
     Extract the Directory tree structure using anytree to store this information
     '''
     #a list to hold our directories
     #root directory is always the bottom directory
-    dirTree = []
+    dirTree: Dict[str:Node] = {}
+    #this holds a list of dir names
+    #Use None to represent top level
+    dirNames: List[str] = []
+    currentDirName: str = None
+    parentDirName: str = None
+    currentDirDepth: int = 0
+    previousDirDepth: int = 0
+    translateRoot = {'/':'root'} #annoying name for root dir
 
     for line in input.split('\n'):
         if '(dir)' in line:
             #get dir name
-            dirName = line.split('-')[-1].split(' (d')[0].strip()
-            
+            currentDirName = line.split('-')[-1].split(' (d')[0].strip()
+            #need to retrieve parent dir
+            currentDirDepth = len(line.split('-')[0])
+            parentDirName: str = findParentDirFromIndentation(currentDirDepth, previousDirDepth, dirNames)
             #set current Dir Name to new name
-            currentDirName = dirName
+            if currentDirName != '/':
+                #get parentDir from Nodes list
+                parentNode: Node = dirTree[parentDirName]
+                newNode = Node(currentDirName, parent=parentNode)
+            else:
+                #initialise root node dir
+                newNode = Node(currentDirName)
+            dirTree[currentDirName] = newNode
+            #update some variables for the next loop
+            previousDirDepth = currentDirDepth
+            dirNames.append(currentDirName)
+    return dirTree
 
+dirTreeDict: Dict[str,Node] = getDirTree(exampleInput)
+
+for pre, fill, node in RenderTree(dirTreeDict['/']):
+    print("%s%s" % (pre, node.name))
 
 # %%
 with open('./input.txt', 'r') as f:
@@ -134,4 +182,7 @@ for line in actualInput.split('\n'):
 
 # %%
 
+'''
+Turns out I actually need to make the directory output first...
+'''
 
