@@ -1,11 +1,141 @@
 #%%
 from typing import List, Dict
-
+from anytree import Node, RenderTree
+from anytree.importer import DictImporter
+importer = DictImporter()
 #read in example input
 with open('./exampleInput.txt', 'r') as f:
     exampleInput = f.read()
 
 exampleInput
+# %%
+
+class file():
+    '''
+    Class to hold properites (attributes) of files we find in the structure
+    Don't think this will need any methods
+    '''
+    def __init__(self, name:str, size:str, dir:str)  -> None:
+        self.name: str = name
+        #size comes in as a str so we convert to int here
+        self.size: int = int(size)
+        self.dir: str = dir
+    
+    def printAttrs(self):
+        '''Just a way to print the attributes if needed'''
+        print(
+            f'Name:\t{self.name}',
+            f'size:\t{self.size}',
+            f'dir:\t{self.dir}',
+            sep='\t'
+        )
+
+class NoSpaceOnDevice():
+    '''
+    Solver class for day7 problem
+    '''
+    def __init__(self) -> None:
+        self.possibleCommands: dict = {
+            'cd': 'move into dir',
+        }
+
+    def findCommandsInInput(self, input: str) -> List[tuple[str]]:
+        '''
+        Parses the puzzle input into something more machine readable
+        '''
+        commandIdentifier="$"
+        commandAndOutput = []
+        #split by $ and then 
+        for combinedString in input.split(commandIdentifier)[1:]:
+            #split so that command is seperate to the other outputs
+            if '\n' in combinedString:
+                command, allOutputs = combinedString.split('\n', maxsplit=1)
+                allOutputs = allOutputs.split('\n')
+            else:
+                command, allOutputs = (combinedString, None)
+            commandAndOutput.append((command, allOutputs))
+        return commandAndOutput
+
+    def buildDirNode(self, dirName: str, dirList: List) -> Node:
+        '''
+        Build up a directory tree from inputs
+        Requires dirTree as input?
+        '''
+        if dirName != '/':
+            #get parentDir from Nodes list
+            parentNode: Node = dirList[-1]
+            newNode = Node(dirName, parent=parentNode)
+        else:
+            #initialise root node dir
+            newNode = Node(dirName)
+        return newNode
+
+    def processCommands(self, input) -> None:
+        '''
+        Takes raw input and then:
+        1. passes it to findCommandsInInput
+        2. goes through each Cmd + Output pair
+        3. 
+
+        3. adds any directories to the directory tree (dirTree, held in dirList)
+        4. creates file objects for any files
+        5. puts files into the fileList
+        '''
+        dirList: List[Node] = [] #holds dir objects
+        fileList: List[file] = [] #holds file objects
+        processedInput = self.findCommandsInInput(input)
+        for combinedCmdAndOutput in processedInput:
+            command, outputList = combinedCmdAndOutput
+            if 'cd' in command:
+                if '..' not in command:
+                    #isolate dir
+                    dirName = command.split(' ')[-1]
+                    #create a new Node
+                    dirList.append(self.buildDirNode(dirName, dirList))
+                else:
+                    #go up 1 level
+
+
+
+
+        
+
+
+#NoSpaceOnDevice().findCommandsInInput(exampleInput)
+NoSpaceOnDevice().processCommands(exampleInput)
+
+
+# %%
+
+myNode = Node('/')
+for dirN in ['a','b','c']:
+    myNode = Node()
+
+
+# %%
+
+c = Node('c')
+c.children = [Node('l'), Node('k')]
+c.children.append(Node('y'))
+# %%
+data = {
+    'a': 'root',
+    'children': [{'a': 'sub0',
+                  'children': [{'a': 'sub0A', 'b': 'foo'}, {'a': 'sub0B'}]},
+                 {'a': 'sub1'}]}
+
+root = importer.import_(data)
+print(RenderTree(root))
+# %%
+
+
+
+
+
+
+
+
+
 # %%
 
 class file():
