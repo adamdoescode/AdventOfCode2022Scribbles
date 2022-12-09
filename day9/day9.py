@@ -16,14 +16,35 @@ class RopeBridge():
             'R': np.array((1,0)),
             'Diag': np.array((1,1)) #special case for Tail
         }
+    
+    def isTailTouchingHead(self, TailPosition: np.array, HeadPosition: np.array) -> bool:
+        '''
+        this function checks if the tail is adjacent to the head
+        wow thanks copilot, that is a neat solution!!
+        Solution is to substract the head position from the tail position
+        Then take the absolute of that value, if it's adjacent it will equal 1
+        np.any() ensures we care if either the x or y distance == 1 (this covers diagonal)
+        We also care if they overlap to it
+        '''
+        #check if tail is adjacent or on same coord as head
+        if np.any(np.abs(TailPosition - HeadPosition) <= 1):
+            return True
+        else:
+            return False
 
     def updateTailPosition(self, TailPosition: np.array, HeadPosition: np.array) -> np.array:
         '''
         this function updates the tail position based on the HeadPosition
         A little more complicated as the tail can move diagonally
         '''
-        TailPosition = np.array((None,None))
-        return TailPosition.copy()
+        #check if tail is touching head
+        if not self.isTailTouchingHead(TailPosition, HeadPosition):
+            #then we must move Tail as appropiate
+            pass
+            return TailPosition.copy()
+        else:
+            #do nothing to tail position
+            return TailPosition.copy()
 
     def updateHeadPosition(self, Direction: str, Movement: int, HeadPosition: np.array) -> np.array:
         '''
@@ -45,10 +66,12 @@ class RopeBridge():
         '''
         #initialise head positon
         HeadPosition = np.array((0,0))
+        #history for head position
         HeadPositionHistory: List[np.array] = []
         HeadPositionHistory.append(HeadPosition.copy())
         #initialise tail positon
         TailPosition = np.array((0,0))
+        #history for tail position
         TailPositionHistory: List[np.array] = []
         TailPositionHistory.append(TailPosition.copy())
         #iterate through instructions
