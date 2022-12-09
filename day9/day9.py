@@ -1,5 +1,5 @@
 #%%
-from typing import List
+from typing import List, Dict
 import numpy as np
 
 # %%
@@ -16,6 +16,19 @@ class RopeBridge():
             'R': np.array((1,0)),
             'Diag': np.array((1,1)) #special case for Tail
         }
+        '''
+        This dict gives us the direction of the head relative to the tail
+        That is the test equation is:
+        TailPosition - HeadPosition = np.array([x,y])
+        '''
+        self.coordToDirectionDict: Dict[tuple,str] = {
+            (0,2): 'U',
+            (0,-2): 'D',
+            (-2,0): 'L',
+            (2,0): 'R',
+            (2,1): 'Diag',
+            (1,2): 'Diag'
+        }
     
     def isTailTouchingHead(self, TailPosition: np.array, HeadPosition: np.array) -> bool:
         '''
@@ -23,11 +36,12 @@ class RopeBridge():
         wow thanks copilot, that is a neat solution!!
         Solution is to substract the head position from the tail position
         Then take the absolute of that value, if it's adjacent it will equal 1
-        np.any() ensures we care if either the x or y distance == 1 (this covers diagonal)
+        np.all() ensures we care if either the x or y distance == 1 (this covers diagonal)
         We also care if they overlap to it
         '''
         #check if tail is adjacent or on same coord as head
-        if np.any(np.abs(TailPosition - HeadPosition) <= 1):
+        if np.all(np.abs(TailPosition - HeadPosition) <= 1):
+            #check special case of diagonal
             return True
         else:
             return False
@@ -40,7 +54,19 @@ class RopeBridge():
         #check if tail is touching head
         if not self.isTailTouchingHead(TailPosition, HeadPosition):
             #then we must move Tail as appropiate
-            pass
+            #determine direction head is relative to tail
+            #first check special case of diagonal
+            if np.all(np.abs(TailPosition - HeadPosition) > 1):
+                pass
+            else:
+                #tail is not touching head but is in either row or column
+                #determine direction
+                Direction = self.coordToDirectionDict[tuple(np.abs(TailPosition - HeadPosition))]
+                #get the way to move (this is a string!)
+                TailPositionMove: str = self.positionInstructionDict[Direction]
+                #update tail position by passing it to positionInstructionDict
+                TailPosition += self.positionInstructionDict[TailPositionMove]
+            #return updated tail position
             return TailPosition.copy()
         else:
             #do nothing to tail position
