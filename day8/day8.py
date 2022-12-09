@@ -1,6 +1,6 @@
 #%%
 from typing import List
-
+from functools import reduce
 # %%
 
 '''
@@ -96,65 +96,35 @@ class findVisibleTrees():
             'up': 0,
             'down': 0
         }
-
         for key in treesAxis:
+            '''
+            There are three outcomes here:
+            1. tree is on an edge so the outcome is 1
+            2. There is a taller or equal tree between tree of interest and edge
+            3. There are no taller trees before the edge
+            '''
             trees = treesAxis[key]
             if trees == '':
                 scencicDistance[key] = 1
+            elif max([int(tree) for tree in trees]) < int(treeHeight):
+                #tests for the case where there are no taller trees
+                scencicDistance[key] = len(trees)
             else:
+                #this finds the distance to a taller (or equal) tree
                 for treeIndex, tree in enumerate(trees):
                     '''We want to find the first tree that is as tall or taller than our tree'''
                     if int(treeHeight) <= int(tree):
                         #then record distance
-                        scencicDistance[key] = treeIndex
+                        scencicDistance[key] = treeIndex+1
                         break
-
-
-
-
-
-
-
-
-
-
-        # for direction, trees in treesAxis.items():
-        #     if trees == '':
-        #         scencicDistance[direction] = 1
-        #     else:
-        #         #convert tree char to int
-        #         intTrees = [int(tree) for tree in trees]
-        #         print(intTrees)
-        #         for treeIndex, tree in enumerate(intTrees):
-        #             if int(treeHeight) <= int(tree):
-        #                 #then record distance
-        #                 scencicDistance[direction] = len(trees[:treeIndex])
-        #                 break
-        print(f"Tree of height {treeHeight} at {x},{y}")
-        print(treesAxis)
-        print(scencicDistance)
-        return sum(scencicDistance.values())
+        orthDistance = reduce(lambda x,y: x*y, scencicDistance.values())
         
-        # # xAxisSplit: List[str] = [left (reversed), right]
-        # xAxisSplit: List[str] = [xAxisRow[:y][::-1], xAxisRow[y+1:]]
-        # #split y axis by tree y position
-        # # yAxisSplit: List[str] = [up (reversed), down]
-        # yAxisSplit: List[str] = [yAxisRow[:x][::-1], yAxisRow[x+1:]]
-        # #iterate across each direction until we find a tree the same height or taller
-        # print(TreesAxis)
-        # distanceVisible: List[int] = []
-        # for trees in xAxisSplit+yAxisSplit:
-        #     if trees == '':
-        #         distanceVisible.append(1)
-        #     else:
-        #         intTrees = [int(tree) for tree in trees]
-        #         for treeIndex, tree in enumerate(intTrees):
-        #             if int(treeHeight) <= int(tree):
-        #                 #then record distance
-        #                 distanceVisible.append(len(trees[:treeIndex])+1)
-        #                 break
-        # print(f"Tree of height {treeHeight} at {x},{y} is visible {distanceVisible} in each direction")
-        # return sum(distanceVisible)
+        # print(f"Tree of height {treeHeight} at {x},{y}")
+        # print(treesAxis)
+        # print(scencicDistance)
+        # print(orthDistance)
+        
+        return orthDistance
 
     
     def findMostScenic(self, rawInput):
@@ -169,6 +139,8 @@ class findVisibleTrees():
                 treeHeight = input[x][y]
                 #get the tree's scenic score
                 scenicScore = self.getScenicScore(treeHeight, x, y, input, yAxis)
+                scenicTrees.append(scenicScore)
+        return max(scenicTrees)
                 
 
 
@@ -182,7 +154,8 @@ findVisibleTrees().findMostScenic(exampleInput)
 # %%
 with open("input.txt", "r") as f:
     input = f.read()
-findVisibleTrees().findVisible(input)
+# findVisibleTrees().findVisible(input)
+findVisibleTrees().findMostScenic(input)
 # %%
 
 '''Debug yaxis function - this now works'''
