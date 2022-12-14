@@ -52,11 +52,28 @@ class RopeBridge():
         First check if the tail is touching or adjacent to the head
         If it is, we don't have to do anything about Tail's position
         '''
-        if not self.isTailTouchingHead():
-            return self.TailPosition.copy()
-        else:
+        if self.isTailTouchingHead():
             #return current position
             return self.TailPosition.copy()
+        else:
+            '''
+            Check if the head is above, below, left or right of the tail
+            And then move TailPosition in that direction
+            '''
+            if self.HeadPosition[0] > self.TailPosition[0]:
+                #head is to the right of tail
+                self.TailPosition[0] += 1
+            elif self.HeadPosition[0] < self.TailPosition[0]:
+                #head is to the left of tail
+                self.TailPosition[0] -= 1
+            if self.HeadPosition[1] > self.TailPosition[1]:
+                #head is above tail
+                self.TailPosition[1] += 1
+            elif self.HeadPosition[1] < self.TailPosition[1]:
+                #head is below tail
+                self.TailPosition[1] -= 1
+            return self.TailPosition.copy()
+            
 
     def updateHeadPosition(self, Direction: str, Movement: int) -> np.array:
         '''
@@ -79,7 +96,7 @@ class RopeBridge():
         print(f'Is tail touching? {self.isTailTouchingHead()}')
         print()
 
-    def updateRopeBridge(self, input: List[str]):
+    def updateRopeBridge(self, input: List[str], printPositions: bool = False):
         '''
         this function updates the bridge
         '''
@@ -105,19 +122,24 @@ class RopeBridge():
                 #update history
                 self.HeadPositionHistory.append(self.HeadPosition.copy())
                 self.TailPositionHistory.append(self.TailPosition.copy())
-            self.printPositions(Direction, Movement)
+            if printPositions:
+                self.printPositions(Direction, Movement)
 
 
 #read in exampleInput.txt
 with open('exampleInput.txt', 'r') as f:
     exampleInput = f.read().splitlines()
 
-RopeBridge().updateRopeBridge(exampleInput)
-RopeBridge().TailPosition
-
+ropes = RopeBridge()
+ropes.updateRopeBridge(exampleInput)
+len(set([tuple(x) for x in ropes.TailPositionHistory]))
 # %%
 with open('input.txt', 'r') as f:
     actualInput = f.read().splitlines()
+
+ropesActual = RopeBridge()
+ropesActual.updateRopeBridge(exampleInput)
+len(set([tuple(x) for x in ropesActual.TailPositionHistory]))
 
 # %%
 '''
