@@ -1,6 +1,7 @@
 #%%
 from typing import List, Dict
 import numpy as np
+from pprint import pprint
 
 class RopeBridge():
     def __init__(self) -> None:
@@ -96,10 +97,13 @@ class RopeBridge():
         print(f'Is tail touching? {self.isTailTouchingHead()}')
         print()
 
-    def updateRopeBridge(self, input: List[str], printPositions: bool = False):
+    def updateRopeBridge(self, input: List[str], printPositions: bool = False, testBoard: bool = False):
         '''
         this function updates the bridge
         '''
+        #if the testboard is true, we need to initialise it
+        if testBoard:
+            self.testBoard()
         #iterate through instructions
         instructions = [instruction.split(' ') for instruction in input]
         for Direction, Movement in instructions:
@@ -124,6 +128,37 @@ class RopeBridge():
                 self.TailPositionHistory.append(self.TailPosition.copy())
             if printPositions:
                 self.printPositions(Direction, Movement)
+            if testBoard:
+                #update the test board
+                self.updateTestBoard()
+                self.printTestBoard()
+    
+    def printTestBoard(self):
+        for row in self.board:
+            print(' '.join(row))
+
+    def testBoard(self):
+        '''
+        Produces a testBoard we can use to test on example answers
+        '''
+        #create a board
+        self.board = [['.' for y in range(21)] for x in range(26)]
+        self.startPoint = [18,10]
+        self.board[self.startPoint[0]][self.startPoint[1]] = 'S'
+        self.printTestBoard()
+        
+    def updateTestBoard(self, print: bool = False):
+        '''
+        Update and then optionally print the test board
+        '''
+        #update the board using Head and tail current positions
+        #test if head and tail position is the same
+        if (self.HeadPosition == self.TailPosition).all():
+            #update board to have just head on it somewhere.
+            self.board[self.HeadPosition[0]][self.HeadPosition[1]] = 'H'
+        else:
+            self.board[self.HeadPosition[0]][self.HeadPosition[1]] = 'H'
+
 
 
 #read in exampleInput.txt
@@ -131,14 +166,14 @@ with open('exampleInput.txt', 'r') as f:
     exampleInput = f.read().splitlines()
 
 ropes = RopeBridge()
-ropes.updateRopeBridge(exampleInput)
-len(set([tuple(x) for x in ropes.TailPositionHistory]))
+ropes.updateRopeBridge(exampleInput, printPositions = False, testBoard = True)
+# len(set([tuple(x) for x in ropes.TailPositionHistory]))
 # %%
 with open('input.txt', 'r') as f:
     actualInput = f.read().splitlines()
 
 ropesActual = RopeBridge()
-ropesActual.updateRopeBridge(exampleInput)
+ropesActual.updateRopeBridge(actualInput)
 len(set([tuple(x) for x in ropesActual.TailPositionHistory]))
 
 # %%
