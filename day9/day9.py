@@ -26,7 +26,7 @@ class RopeBridge():
         #history for tail position
         self.TailPositionHistory: List[np.array] = [self.TailPosition.copy()]
         
-    def isTailTouchingHead(self, TailPosition: np.array, HeadPosition: np.array) -> bool:
+    def isTailTouchingHead(self) -> bool:
         '''
         this function checks if the tail is adjacent to the head
         wow thanks copilot, that is a neat solution!!
@@ -34,31 +34,31 @@ class RopeBridge():
         Then take the absolute of that value, if it's adjacent it will equal 1
         np.all() ensures we care if either the x or y distance == 1 (this covers diagonal)
         We also care if they overlap to it
+
+        I checked this and it seems to work fine.
         '''
         #check if tail is adjacent or on same coord as head
-        if np.all(np.abs(TailPosition - HeadPosition) <= 1):
+        if np.all(np.abs(self.TailPosition - self.HeadPosition) <= 1):
             #check special case of diagonal
             return True
         else:
             return False
 
-    def updateTailPosition(self, TailPosition: np.array, HeadPosition: np.array) -> np.array:
+    def updateTailPosition(self) -> np.array:
         '''
         this function updates the tail position based on the HeadPosition
         A little more complicated as the tail can move diagonally
-        Just implemented as a series of if statements... not elegant 🙃
-        '''
-        '''
+        Just implemented as a series of if statements... not elegant 🙃 Not implemented at all actually! 🤣
         First check if the tail is touching or adjacent to the head
         If it is, we don't have to do anything about Tail's position
         '''
-        if not self.isTailTouchingHead(TailPosition, HeadPosition):
-            return TailPosition.copy()
+        if not self.isTailTouchingHead():
+            return self.TailPosition.copy()
         else:
             #return current position
-            return TailPosition.copy()
+            return self.TailPosition.copy()
 
-    def updateHeadPosition(self, Direction: str, Movement: int, HeadPosition: np.array) -> np.array:
+    def updateHeadPosition(self, Direction: str, Movement: int) -> np.array:
         '''
         this function updates the head position
         Movement should always be 1
@@ -68,14 +68,15 @@ class RopeBridge():
         except AssertionError:
             print('Movement should always be 1')
         #update head position
-        HeadPosition += self.positionInstructionDict[Direction]
-        return HeadPosition.copy()
+        self.HeadPosition += self.positionInstructionDict[Direction]
+        return self.HeadPosition.copy()
 
     def printPositions(self, Direction: str = None, Movement: int = None):
         '''some print statements for lazy checking'''
         print(f'Direction: {Direction}\tMovement: {Movement}')
         print(f'HeadPosition: {self.HeadPosition}')
         print(f'TailPosition: {self.TailPosition}')
+        print(f'Is tail touching? {self.isTailTouchingHead()}')
         print()
 
     def updateRopeBridge(self, input: List[str]):
@@ -91,16 +92,16 @@ class RopeBridge():
             '''When Movement > 1 we need to update the head position Movement times'''
             if Movement > 1:
                 for i in range(Movement):
-                    self.HeadPosition = self.updateHeadPosition(Direction, 1, self.HeadPosition)
-                    self.TailPosition = self.updateTailPosition(self.TailPosition, self.HeadPosition)
+                    self.HeadPosition = self.updateHeadPosition(Direction, 1)
+                    self.TailPosition = self.updateTailPosition()
                     #update history
                     self.HeadPositionHistory.append(self.HeadPosition.copy())
                     self.TailPositionHistory.append(self.TailPosition.copy())
             else:
-                self.HeadPosition = self.updateHeadPosition(Direction, Movement, self.HeadPosition)
-                self.TailPosition = self.updateTailPosition(self.TailPosition, self.HeadPosition)
+                self.HeadPosition = self.updateHeadPosition(Direction, Movement)
+                self.TailPosition = self.updateTailPosition()
                 #update tail position
-                self.TailPosition = self.updateTailPosition(self.TailPosition, self.HeadPosition)
+                self.TailPosition = self.updateTailPosition()
                 #update history
                 self.HeadPositionHistory.append(self.HeadPosition.copy())
                 self.TailPositionHistory.append(self.TailPosition.copy())
@@ -117,6 +118,9 @@ RopeBridge().TailPosition
 # %%
 with open('input.txt', 'r') as f:
     actualInput = f.read().splitlines()
-actualInput
 
 # %%
+'''
+Let's test the behaviour of Tailposition?
+'''
+
