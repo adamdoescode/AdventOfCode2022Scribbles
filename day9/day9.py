@@ -97,13 +97,13 @@ class RopeBridge():
         print(f'Is tail touching? {self.isTailTouchingHead()}')
         print()
 
-    def updateRopeBridge(self, input: List[str], printPositions: bool = False, testBoard: bool = False):
+    def updateRopeBridge(self, input: List[str], printPositions: bool = False, testBoard: bool = False, xDim = 6, yDim = 5):
         '''
         this function updates the bridge
         '''
         #if the testboard is true, we need to initialise it
         if testBoard:
-            self.testBoard()
+            self.testBoard(xDim = 6, yDim = 5)
         #iterate through instructions
         instructions = [instruction.split(' ') for instruction in input]
         for Direction, Movement in instructions:
@@ -137,13 +137,14 @@ class RopeBridge():
         for row in self.board:
             print(' '.join(row))
 
-    def testBoard(self):
+    def testBoard(self, xDim = 6, yDim = 5):
         '''
         Produces a testBoard we can use to test on example answers
         '''
         #create a board
-        self.board = [['.' for y in range(21)] for x in range(26)]
-        self.startPoint = [18,10]
+        self.board = [['.' for y in range(yDim)] for x in range(xDim)]
+        # self.startPoint = [int(xDim/2),int(yDim/2)]
+        self.startPoint = [0,0]
         self.board[self.startPoint[0]][self.startPoint[1]] = 'S'
         self.printTestBoard()
         
@@ -166,7 +167,7 @@ with open('exampleInput.txt', 'r') as f:
     exampleInput = f.read().splitlines()
 
 ropes = RopeBridge()
-ropes.updateRopeBridge(exampleInput, printPositions = False, testBoard = True)
+ropes.updateRopeBridge(exampleInput, printPositions = True, testBoard = True, xDim = 6, yDim = 5)
 # len(set([tuple(x) for x in ropes.TailPositionHistory]))
 # %%
 with open('input.txt', 'r') as f:
