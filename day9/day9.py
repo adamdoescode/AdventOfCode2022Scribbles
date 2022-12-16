@@ -104,6 +104,8 @@ class RopeBridge():
         #if the testboard is true, we need to initialise it
         if testBoard:
             self.testBoard(xDim = 6, yDim = 5)
+            self.updateTestBoard()
+            self.printTestBoard()
         #iterate through instructions
         instructions = [instruction.split(' ') for instruction in input]
         for Direction, Movement in instructions:
@@ -137,16 +139,18 @@ class RopeBridge():
         for row in self.board:
             print(' '.join(row))
 
-    def testBoard(self, xDim = 6, yDim = 5):
+    def testBoard(self, xDim = 6, yDim = 5, printBoard: bool = False):
         '''
         Produces a testBoard we can use to test on example answers
         '''
         #create a board
         self.board = [['.' for y in range(yDim)] for x in range(xDim)]
+        #[Y, X]
         # self.startPoint = [int(xDim/2),int(yDim/2)]
-        self.startPoint = [0,0]
+        self.startPoint = [-1,0]
         self.board[self.startPoint[0]][self.startPoint[1]] = 'S'
-        self.printTestBoard()
+        if printBoard:
+            self.printTestBoard()
         
     def updateTestBoard(self, print: bool = False):
         '''
