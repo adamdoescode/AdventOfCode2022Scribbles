@@ -23,10 +23,12 @@ class cathodeTube:
         '''Parses the instruction'''
         #check if the instruction is valid
         if "noop" in instruction:
-            return ("noop")
+            return ("noop", None)
         elif "addx" in instruction:
             number = int(instruction.split(" ")[1])
             return ("addx", number)
+        else:
+            raise ValueError(f"Invalid instruction: {instruction}")
 
     def run(self, instructions:list):
         '''Runs the instructions'''
@@ -57,10 +59,11 @@ class cathodeTube:
         20th
         and then every 40th
         Returns an iterable of the values of those registers
+        Each is a tuple: (index, value)
         '''
         cycleIndex = 19 #off by one
         while cycleIndex < len(self.cycles):
-            yield self.cycles[cycleIndex]
+            yield (cycleIndex+1, self.cycles[cycleIndex])
             cycleIndex += 40
     
     def printCyclesAndInstructions(self, start:int, end:int):
@@ -68,7 +71,14 @@ class cathodeTube:
         print(f"i\ti+1\tregister\tinstruction")
         for i in range(start, end):
             print(f"{i}\t{i+1}\t{self.cycles[i]}\t{self.instructionsRecord[i]}")
-
+    
+    def returnSignalStrength(self) -> int:
+        '''
+        Returns the signal strength
+        which is the index * value for each interesting register
+        '''
+        for index, value in self.interestingRegisters():
+            yield index*value
 
 
 # %%
@@ -87,10 +97,13 @@ with open("largerExampleInput.txt", "r") as f:
 
 largerCathodeTube = cathodeTube()
 largerCathodeTube.run(largerExampleInput)
-#largerCathodeTube.cycles
-#list(largerCathodeTube.interestingRegisters())
-largerCathodeTube.printCyclesAndInstructions(17,21)
-# %%
-largerCathodeTube.printCyclesAndInstructions(55,60)
+sum(list(largerCathodeTube.returnSignalStrength()))
 
 # %%
+#read and process input.txt
+with open("input.txt", "r") as f:
+    input = f.read().splitlines()
+
+inputCathodeTube = cathodeTube()
+inputCathodeTube.run(input)
+
