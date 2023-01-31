@@ -12,15 +12,12 @@ Assuming former for now.
 class cathodeTube:
     '''Implements the solution'''
     def __init__(self) -> None:
-        #instructions we will be interpreting
-        self.instructions = {
-            "noop": None,
-            "addx": 1,
-        }
         #instructions modify this register
         self.register = 1
         #records the register value after each instruction
         self.cycles = [self.register]
+        #instructions are stored as a list of strings
+        self.instructionsRecord = []
     
     def parseInstruction(self, instruction:str) -> tuple:
         '''Parses the instruction'''
@@ -39,9 +36,13 @@ class cathodeTube:
             #update register
             if instructionTuple[0] == "noop":
                 #register stays the same, add it to the cycles list
+                self.instructionsRecord.append(instructionTuple)
                 self.cycles.append(self.register)
             elif instructionTuple[0] == "addx":
                 #this instruction takes 2 cycles
+                #so add the instruction to the record twice
+                self.instructionsRecord.append(instructionTuple)
+                self.instructionsRecord.append(instructionTuple)
                 #in first cycle we do nothing
                 #so we add a new cycle with the same value as the previous cycle
                 self.cycles.append(self.register)
@@ -61,6 +62,13 @@ class cathodeTube:
         while cycleIndex < len(self.cycles):
             yield self.cycles[cycleIndex]
             cycleIndex += 40
+    
+    def printCyclesAndInstructions(self, start:int, end:int):
+        '''Prints the cycles and instructions'''
+        print(f"i\ti+1\tcycle\tinstruction")
+        for i in range(start, end):
+            print(f"{i}\t{i+1}\t{self.cycles[i]}\t{self.instructionsRecord[i]}")
+
 
 
 # %%
@@ -80,5 +88,9 @@ with open("largerExampleInput.txt", "r") as f:
 largerCathodeTube = cathodeTube()
 largerCathodeTube.run(largerExampleInput)
 #largerCathodeTube.cycles
-list(largerCathodeTube.interestingRegisters())
+#list(largerCathodeTube.interestingRegisters())
+largerCathodeTube.printCyclesAndInstructions(17,21)
+# %%
+largerCathodeTube.printCyclesAndInstructions(55,60)
+
 # %%
