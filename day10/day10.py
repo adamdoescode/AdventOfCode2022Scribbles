@@ -65,7 +65,7 @@ class cathodeTube:
     
     def printCyclesAndInstructions(self, start:int, end:int):
         '''Prints the cycles and instructions'''
-        print(f"i\ti+1\tcycle\tinstruction")
+        print(f"i\ti+1\tregister\tinstruction")
         for i in range(start, end):
             print(f"{i}\t{i+1}\t{self.cycles[i]}\t{self.instructionsRecord[i]}")
 
